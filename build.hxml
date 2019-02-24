@@ -1,0 +1,9 @@
+-main Main
+
+-lib hxp
+
+-cp src
+
+--macro nullSafety('Main')
+
+-neko run.n

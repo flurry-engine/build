@@ -1,0 +1,4 @@
+-D checkstyle=2.4.2
+# @install: lix --silent download "haxelib:/checkstyle#2.4.2" into checkstyle/2.4.2/haxelib
+# @run: haxelib run-dir checkstyle ${HAXE_LIBCACHE}/checkstyle/2.4.2/haxelib
+-cp ${HAXE_LIBCACHE}/checkstyle/2.4.2/haxelib/src
