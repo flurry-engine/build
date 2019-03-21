@@ -1,4 +1,3 @@
-package;
 
 import hxp.Script;
 import hxp.Log;

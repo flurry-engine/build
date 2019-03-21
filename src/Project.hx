@@ -1,4 +1,3 @@
-package;
 
 import sys.io.File;
 import sys.FileSystem;
@@ -55,7 +54,7 @@ class Project extends Script
     /**
      * List of directories relative to the build file and how they will be copied into the output directory relative to the binary.
      */
-    final files : Map<String, String>;
+    var files : Map<String, String>;
 
     public final function new()
     {
@@ -78,10 +77,12 @@ class Project extends Script
                 compile(pathBuild, pathRelease);
 
             case 'run':
-                run();
+                compile(pathBuild, pathRelease);
+                run(pathRelease);
 
             case 'package':
-                distribute();
+                compile(pathBuild, pathRelease);
+                distribute(pathRelease);
 
             case 'clean':
                 System.removeDirectory(app.output);
@@ -159,16 +160,20 @@ class Project extends Script
         build.defines.push('snow_native');
 
         // Add snow required libraries and user specified libraries.
-        build.dependencies.set('hxcpp'          , null);
-        build.dependencies.set('haxe-concurrent', null);
-        build.dependencies.set('linc_opengl'    , null);
-        build.dependencies.set('linc_directx'   , null);
-        build.dependencies.set('linc_sdl'       , null);
-        build.dependencies.set('linc_ogg'       , null);
-        build.dependencies.set('linc_stb'       , null);
-        build.dependencies.set('linc_timestamp' , null);
-        build.dependencies.set('linc_openal'    , null);
-        build.dependencies.set('snow'           , null);
+        build.dependencies.set('hxcpp'              , null);
+        build.dependencies.set('flurry'             , null);
+        build.dependencies.set('haxe-concurrent'    , null);
+        build.dependencies.set('linc_opengl'        , null);
+        build.dependencies.set('linc_directx'       , null);
+        build.dependencies.set('linc_sdl'           , null);
+        build.dependencies.set('linc_ogg'           , null);
+        build.dependencies.set('linc_stb'           , null);
+        build.dependencies.set('linc_timestamp'     , null);
+        build.dependencies.set('linc_openal'        , null);
+        build.dependencies.set('sys.io.abstractions', null);
+        build.dependencies.set('format'             , null);
+        build.dependencies.set('safety'             , null);
+        build.dependencies.set('snow'               , null);
 
         // Add snow required macros and user specified macros.
         build.macros.push('snow.Set.assets("snow.core.native.assets.Assets")');
@@ -230,7 +235,7 @@ class Project extends Script
     final function commonCopy(_hxml : HXML)
     {
         for (p in app.codepaths)
-        {
+        {           
             _hxml.cp(p);
         }
 
@@ -266,36 +271,21 @@ class Project extends Script
         }
     }
 
-    final function run()
-    {
-        //
-    }
-    
-    final function distribute()
-    {
-        //
-    }
-
-    /*
-
-    final function snowRun(_pathRelease : String)
+    final function run(_pathRelease : String)
     {
         switch (System.hostPlatform)
         {
             case WINDOWS:
                 System.runCommand(workingDirectory, Path.combine(_pathRelease, '${app.name}.exe'), []);
-            
             case MAC, LINUX:
                 System.runCommand(workingDirectory, Path.join([ _pathRelease, app.name ]), []);
         }
     }
-
-    final function snowPackage(_pathRelease : String)
+    
+    final function distribute(_pathRelease : String)
     {
         System.compress(_pathRelease, Path.combine(app.output, '${app.name}-${System.hostPlatform}${System.hostArchitecture.getName()}.zip'));
     }
-
-    */
 }
 
 private class ProjectMeta

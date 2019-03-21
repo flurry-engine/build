@@ -1,4 +1,3 @@
-package;
 
 import sys.FileSystem;
 import hxp.Haxelib;
@@ -104,8 +103,9 @@ class Main
 		var className = Path.withoutExtension (file);
 		className = className.substr (0, 1).toUpperCase () + className.substr (1);
 		
-		var buildArgs = [ "-cp", FileSystem.absolutePath(Path.combine (Haxelib.getPath (new Haxelib ("hxp")), "src")), "-cp", FileSystem.absolutePath(Path.combine (Haxelib.getPath (new Haxelib ("build")), "src")) ];
-		var runArgs = [ (_command == null || _command == "") ? "default" : _command ];
+		var version = "0.0.0";
+		var buildArgs = [ className, "-D", "hxp="+ version, "-cp", Path.combine (Haxelib.getPath (new Haxelib ("hxp")), "src"), "-cp", Path.combine (Haxelib.getPath (new Haxelib ("build")), "src") ];
+		var runArgs = [ 'hxp.Script', (_command == null || _command == "") ? "default" : _command ];
 		runArgs = runArgs.concat (arguments);
 		
 		runArgs.push (className);
@@ -135,9 +135,19 @@ class Main
 			return '';
 		}
 
+		if (FileSystem.exists('Build.hxp'))
+		{
+			return FileSystem.fullPath('Build.hxp');
+		}
+
 		if (FileSystem.exists('build.hxp'))
 		{
 			return FileSystem.fullPath('build.hxp');
+		}
+
+		if (FileSystem.exists('Build.hx'))
+		{
+			return FileSystem.fullPath('Build.hx');
 		}
 
 		if (FileSystem.exists('build.hx'))
