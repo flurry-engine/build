@@ -153,11 +153,11 @@ class Project extends Script
         // Add snow required defines, user specified defines, and a define for each libraries name.
         build.defines.push(System.hostPlatform);
         build.defines.push('target-cpp');
-        build.defines.push('arch-64');
         build.defines.push('desktop');
         build.defines.push('hxcpp_static_std');
         build.defines.push('snow_use_glew');
         build.defines.push('snow_native');
+        build.defines.push('HXCPP_M64');
 
         // Add snow required libraries and user specified libraries.
         build.dependencies.set('hxcpp'              , null);
