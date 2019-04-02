@@ -276,9 +276,9 @@ class Project extends Script
         switch (System.hostPlatform)
         {
             case WINDOWS:
-                System.runCommand(workingDirectory, Path.combine(_pathRelease, '${app.name}.exe'), []);
+                System.runCommand(Path.combine(workingDirectory, _pathRelease), '${app.name}.exe', []);
             case MAC, LINUX:
-                System.runCommand(workingDirectory, Path.join([ _pathRelease, app.name ]), []);
+                System.runCommand(Path.combine(workingDirectory, _pathRelease), app.name, []);
         }
     }
     
