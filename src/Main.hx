@@ -107,7 +107,7 @@ class Main
 		runArgs.push(className);
 		runArgs.push(Sys.getCwd());
 		
-		System.runScript (_script, buildArgs, runArgs, dir);
+		System.runScript(_script, buildArgs, runArgs, dir);
 	}
 
 	/**

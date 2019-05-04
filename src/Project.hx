@@ -279,7 +279,7 @@ class Project extends Script
             case WINDOWS:
                 System.runCommand(Path.combine(workingDirectory, _pathRelease), '${app.name}.exe', []);
             case MAC, LINUX:
-                System.runCommand(Path.combine(workingDirectory, _pathRelease), app.name, []);
+                System.runCommand(workingDirectory, Path.combine(_pathRelease, app.name), []);
         }
     }
     
