@@ -173,6 +173,7 @@ class Project extends Script
         build.dependencies.set('sys.io.abstractions', null);
         build.dependencies.set('format'             , null);
         build.dependencies.set('safety'             , null);
+        build.dependencies.set('signals'            , null);
         build.dependencies.set('snow'               , null);
 
         // Add snow required macros and user specified macros.
