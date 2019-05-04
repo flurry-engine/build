@@ -93,23 +93,19 @@ class Main
 	 * @param _command Optional command for the script.
 	 */
 	function runHxpScript(_script : String, _command : String)
-	{
-		Log.verbose = true;
+	{	
+		var dir       = Path.directory(_script);
+		var file      = Path.withoutDirectory(_script);
+		var className = Path.withoutExtension(file);
+		className = className.substr(0, 1).toUpperCase() + className.substr(1);
 		
-		Log.info("", Log.accentColor + "Executing script: " + _script + Log.resetColor);
+		var version   = '0.0.0';
+		var buildArgs = [ className, '-D', 'hxp=$version', '-cp', Path.combine(Haxelib.getPath(new Haxelib('hxp')), 'src'), '-cp', Path.combine(Haxelib.getPath(new Haxelib('build')), 'src') ];
+		var runArgs   = [ 'hxp.Script', (_command == null || _command == '') ? 'default' : _command ];
+		runArgs       = runArgs.concat (arguments);
 		
-		var dir = Path.directory (_script);
-		var file = Path.withoutDirectory (_script);
-		var className = Path.withoutExtension (file);
-		className = className.substr (0, 1).toUpperCase () + className.substr (1);
-		
-		var version = "0.0.0";
-		var buildArgs = [ className, "-D", "hxp="+ version, "-cp", Path.combine (Haxelib.getPath (new Haxelib ("hxp")), "src"), "-cp", Path.combine (Haxelib.getPath (new Haxelib ("build")), "src") ];
-		var runArgs = [ 'hxp.Script', (_command == null || _command == "") ? "default" : _command ];
-		runArgs = runArgs.concat (arguments);
-		
-		runArgs.push (className);
-		runArgs.push (Sys.getCwd ());
+		runArgs.push(className);
+		runArgs.push(Sys.getCwd());
 		
 		System.runScript (_script, buildArgs, runArgs, dir);
 	}
