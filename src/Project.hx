@@ -166,10 +166,8 @@ class Project extends Script
         build.dependencies.set('linc_opengl'        , null);
         build.dependencies.set('linc_directx'       , null);
         build.dependencies.set('linc_sdl'           , null);
-        build.dependencies.set('linc_ogg'           , null);
         build.dependencies.set('linc_stb'           , null);
         build.dependencies.set('linc_timestamp'     , null);
-        build.dependencies.set('linc_openal'        , null);
         build.dependencies.set('sys.io.abstractions', null);
         build.dependencies.set('format'             , null);
         build.dependencies.set('safety'             , null);
@@ -177,10 +175,6 @@ class Project extends Script
         build.dependencies.set('snow'               , null);
 
         // Add snow required macros and user specified macros.
-        build.macros.push('snow.Set.assets("snow.core.native.assets.Assets")');
-        build.macros.push('snow.Set.runtime("snow.modules.sdl.Runtime")');
-        build.macros.push('snow.Set.audio("snow.modules.openal.Audio")');
-        build.macros.push('snow.Set.io("snow.modules.sdl.IO")');
 
         commonCopy(user);
 
@@ -188,6 +182,9 @@ class Project extends Script
         snow.addMacro('snow.Set.ident("${app.namespace}")');
         snow.addMacro('snow.Set.config("config.json")');
         snow.addMacro('snow.Set.runtime("${ snowGetRuntimeString() }")');
+        snow.addMacro('snow.Set.assets("snow.core.native.assets.Assets")');
+        snow.addMacro('snow.Set.audio("snow.core.Audio")');
+        snow.addMacro('snow.Set.io("snow.modules.sdl.IO")');
         snow.addMacro('snow.api.Debug.level(${ build.snow.log })');
 
         // Write the two snow build hxmls and build them.
