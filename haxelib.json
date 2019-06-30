@@ -6,8 +6,5 @@
     "contributors": [
         "Aidan"
     ],
-    "releasenote": "Initial release",
-    "dependencies": {
-        "hxp" : "gh:aidan63/hxp#no-codepath-quotes"
-    }
+    "releasenote": "Initial release"
 }
