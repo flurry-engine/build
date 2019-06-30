@@ -8,6 +8,6 @@
     ],
     "releasenote": "Initial release",
     "dependencies": {
-        "hxp" : ""
+        "hxp" : "gh:aidan63/hxp#no-codepath-quotes"
     }
 }
