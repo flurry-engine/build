@@ -5,7 +5,6 @@
 -lib sys.io.abstractions
 
 -cp src
--cp scripts
 
 --macro nullSafety('Main')
 
