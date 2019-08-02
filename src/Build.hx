@@ -1,16 +1,21 @@
 
-import sys.FileSystem;
-import hxp.Haxelib;
 import hxp.Path;
-import hxp.System;
 import hxp.Log;
+import sys.io.abstractions.IFileSystem;
+import sys.io.abstractions.concrete.FileSystem;
 
-class Main
+class Build
 {
 	static function main()
 	{
-		new Main();
+		new Build(new FileSystem(), new SysHelper(), new HaxelibHelper());
 	}
+
+	final fileSystem : IFileSystem;
+
+	final sys : SysHelper;
+
+	final lib : HaxelibHelper;
 
 	/**
 	 * The command line arguments passed when this program was ran.
@@ -18,25 +23,27 @@ class Main
 	 */
 	final arguments : Array<String>;
 
-	public function new()
+	public function new(_fileSystem : IFileSystem, _sys : SysHelper, _lib : HaxelibHelper)
 	{
-		arguments = Sys.args();
+		fileSystem = _fileSystem;
+		sys        = _sys;
+		lib        = _lib;
+		arguments  = sys.getArgs();
 
 		// When the tool is ran from haxelib the CWD is the root directory of the haxelib.
 		// Haxelib also appends the CWD where it was called from as a last argument and sets the 'HAXELIB_RUN' env.
 		// So if we are running in haxelib mode set the CWD to the last cli argument.
-		if (Sys.getEnv('HAXELIB_RUN') == '1')
+		if (sys.getEnv('HAXELIB_RUN') == '1')
 		{
-			var cwd = arguments.pop();
+			final cwd = arguments.pop();
 			if (cwd != null)
 			{
-				Sys.setCwd(cwd);
+				sys.setCwd(cwd);
 			}
 		}
 
-		switch (arguments.shift())
+		switch arguments.shift()
 		{
-
 			case 'build':
 				doBuildCommand('build');
 
@@ -60,11 +67,9 @@ class Main
 	 */
 	function doBuildCommand(_command : String)
 	{
-		var script  = findBuildScript();
+		final script = findBuildScript();
 		if (script != '')
 		{
-			Log.println(script);
-
 			runHxpScript(script, _command);
 		}
 		else
@@ -78,8 +83,8 @@ class Main
 	 */
 	function doHelpCommand()
 	{
-		var script  = Path.join([ Haxelib.getPath(new Haxelib('build')), 'src', 'Help.hx' ]);
-		var command = arguments.length == 0 ? 'default' : arguments.shift();
+		final script  = Path.join([ lib.getDirectory('build'), 'scripts', 'Help.hx' ]);
+		final command = arguments.length == 0 ? 'default' : arguments.shift();
 
 		if (command != null)
 		{
@@ -94,20 +99,24 @@ class Main
 	 */
 	function runHxpScript(_script : String, _command : String)
 	{	
-		var dir       = Path.directory(_script);
-		var file      = Path.withoutDirectory(_script);
+		final dir  = Path.directory(_script);
+		final file = Path.withoutDirectory(_script);
+
 		var className = Path.withoutExtension(file);
 		className = className.substr(0, 1).toUpperCase() + className.substr(1);
 		
-		var version   = '0.0.0';
-		var buildArgs = [ className, '-D', 'hxp=$version', '-cp', Path.combine(Haxelib.getPath(new Haxelib('hxp')), 'src'), '-cp', Path.combine(Haxelib.getPath(new Haxelib('build')), 'src') ];
-		var runArgs   = [ 'hxp.Script', (_command == null || _command == '') ? 'default' : _command ];
-		runArgs       = runArgs.concat (arguments);
+		final version   = '1.1.2';
+		final buildArgs = [
+			className,
+			'-D', 'hxp=$version',
+			'-cp', Path.combine(lib.getDirectory('hxp'), 'src'),
+			'-cp', Path.combine(lib.getDirectory('build'), 'scripts') ];
+		final runArgs = [ 'hxp.Script', (_command == null || _command == '') ? 'default' : _command ].concat(arguments);
 		
 		runArgs.push(className);
-		runArgs.push(Sys.getCwd());
+		runArgs.push(sys.getCwd());
 		
-		System.runScript(_script, buildArgs, runArgs, dir);
+		sys.runScript(_script, buildArgs, runArgs, dir);
 	}
 
 	/**
@@ -120,35 +129,38 @@ class Main
 	 */
 	function findBuildScript() : String
 	{
-		if (arguments.length > 0 && FileSystem.exists(arguments[0]))
+		if (arguments.length > 0)
 		{
-			var script = arguments.shift();
-			if (script != null)
+			if (fileSystem.file.exists(arguments[0]))
 			{
-				return FileSystem.fullPath(script);
+				return sys.fullPath(arguments.shift());
 			}
-			
-			return '';
+			else
+			{
+				Log.println('Build script "${arguments[0]}" does not exist');
+
+				return '';
+			}
 		}
 
-		if (FileSystem.exists('Build.hxp'))
+		if (fileSystem.file.exists('Build.hxp'))
 		{
-			return FileSystem.fullPath('Build.hxp');
+			return sys.fullPath('Build.hxp');
 		}
 
-		if (FileSystem.exists('build.hxp'))
+		if (fileSystem.file.exists('build.hxp'))
 		{
-			return FileSystem.fullPath('build.hxp');
+			return sys.fullPath('build.hxp');
 		}
 
-		if (FileSystem.exists('Build.hx'))
+		if (fileSystem.file.exists('Build.hx'))
 		{
-			return FileSystem.fullPath('Build.hx');
+			return sys.fullPath('Build.hx');
 		}
 
-		if (FileSystem.exists('build.hx'))
+		if (fileSystem.file.exists('build.hx'))
 		{
-			return FileSystem.fullPath('build.hx');
+			return sys.fullPath('build.hx');
 		}
 
 		return '';

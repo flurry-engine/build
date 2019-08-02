@@ -1,8 +1,11 @@
--main Main
+-main Build
 
 -lib hxp
+-lib exception
+-lib sys.io.abstractions
 
 -cp src
+-cp scripts
 
 --macro nullSafety('Main')
 

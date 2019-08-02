@@ -17,7 +17,6 @@ private enum BuildProfile
 
 private enum BuildBackend
 {
-    Haxe;
     Snow;
     Kha;
 }
@@ -26,7 +25,7 @@ private enum FlurrySnowRuntime
 {
     Desktop;
     Cli;
-    Custom;
+    Custom(_package : String);
 }
 
 class Project extends Script
@@ -104,8 +103,6 @@ class Project extends Script
     {
         switch (backend)
         {
-            case Haxe:
-                //
             case Snow:
                 compileSnow(_pathBuild, _pathRelease);
             case _unsupported:
@@ -137,7 +134,7 @@ class Project extends Script
                 user.debug = true;
                 user.noOpt = true;
                 user.dce   = NO;
-                build.defines.push('annotate_source');
+                build.defines.set('annotate_source', null);
             case Default:
                 user.dce = STD;
             case Release:
@@ -151,13 +148,14 @@ class Project extends Script
         }
 
         // Add snow required defines, user specified defines, and a define for each libraries name.
-        build.defines.push(System.hostPlatform);
-        build.defines.push('target-cpp');
-        build.defines.push('desktop');
-        build.defines.push('hxcpp_static_std');
-        build.defines.push('snow_use_glew');
-        build.defines.push('snow_native');
-        build.defines.push('HXCPP_M64');
+        build.defines.set(System.hostPlatform  , null);
+        build.defines.set('target-cpp'         , null);
+        build.defines.set('desktop'            , null);
+        build.defines.set('hxcpp_static_std'   , null);
+        build.defines.set('snow_use_glew'      , null);
+        build.defines.set('snow_native'        , null);
+        build.defines.set('HXCPP_M64'          , null);
+        build.defines.set('flurry-entry-point' , app.main);
 
         // Add snow required libraries and user specified libraries.
         build.dependencies.set('hxcpp'              , null);
@@ -178,7 +176,7 @@ class Project extends Script
 
         commonCopy(user);
 
-        snow.addMacro('snow.Set.main("${app.main}")');
+        snow.addMacro('snow.Set.main("uk.aidanlee.flurry.snow.host.FlurrySnowHost")');
         snow.addMacro('snow.Set.ident("${app.namespace}")');
         snow.addMacro('snow.Set.config("config.json")');
         snow.addMacro('snow.Set.runtime("${ snowGetRuntimeString() }")');
@@ -237,9 +235,9 @@ class Project extends Script
             _hxml.cp(p);
         }
 
-        for (d in build.defines)
+        for (d => v in build.defines)
         {
-            _hxml.define(d);
+            _hxml.define(d, v);
         }
 
         for (m in build.macros)
@@ -254,30 +252,19 @@ class Project extends Script
         }
     }
 
-    final function snowGetRuntimeString() : String
+    final function snowGetRuntimeString() : String return switch build.snow.runtime
     {
-        if (build.snow.runtime == Custom)
-        {
-            return build.snow.overrideRuntime;
-        }
-
-        return switch (build.snow.runtime)
-        {
-            case Desktop: 'uk.aidanlee.flurry.utils.runtimes.FlurryRuntimeDesktop';
-            case Cli:     'uk.aidanlee.flurry.utils.runtimes.FlurryRuntimeCLI';
-            default: throw 'No snow runtime found for the target';
-        }
+        case Desktop: 'uk.aidanlee.flurry.snow.runtime.FlurrySnowDesktopRuntime';
+        case Cli    : 'uk.aidanlee.flurry.snow.runtime.FlurrySnowCLIRuntime';
+        case Custom(_package): _package;
     }
 
-    final function run(_pathRelease : String)
+    final function run(_pathRelease : String) switch System.hostPlatform
     {
-        switch (System.hostPlatform)
-        {
-            case WINDOWS:
-                System.runCommand(Path.combine(workingDirectory, _pathRelease), '${app.name}.exe', []);
-            case MAC, LINUX:
-                System.runCommand(workingDirectory, Path.combine(_pathRelease, app.name), []);
-        }
+        case WINDOWS:
+            System.runCommand(Path.combine(workingDirectory, _pathRelease), '${app.name}.exe', []);
+        case MAC, LINUX:
+            System.runCommand(workingDirectory, Path.combine(_pathRelease, app.name), []);
     }
     
     final function distribute(_pathRelease : String)
@@ -370,7 +357,7 @@ private class ProjectBuild
      * Certain libraries will be automatically passed in depeneding on the target.
      * E.g. snow desktop target will add hxcpp and snow
      */
-    public var dependencies : Map<String, String>;
+    public var dependencies : Map<String, Null<String>>;
 
     /**
      * List of macros to run at compile time (--macro).
@@ -380,7 +367,7 @@ private class ProjectBuild
     /**
      * List of defines to pass to the compiler (-Dvalue).
      */
-    public var defines : Array<String>;
+    public var defines : Map<String, Null<String>>;
 
     /**
      * All snow specific build options.

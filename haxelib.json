@@ -2,7 +2,7 @@
     "name"      : "build",
     "license"   : "MIT",
     "version"   : "0.0.1",
-    "classPath" : "src",
+    "classPath" : "",
     "contributors": [
         "Aidan"
     ],
