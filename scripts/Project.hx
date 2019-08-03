@@ -159,7 +159,6 @@ class Project extends Script
 
         // Add snow required libraries and user specified libraries.
         build.dependencies.set('hxcpp'              , null);
-        build.dependencies.set('flurry'             , null);
         build.dependencies.set('haxe-concurrent'    , null);
         build.dependencies.set('linc_opengl'        , null);
         build.dependencies.set('linc_directx'       , null);

@@ -133,7 +133,7 @@ class Build
 		{
 			if (fileSystem.file.exists(arguments[0]))
 			{
-				return sys.fullPath(arguments.shift());
+				return sys.fullPath(arguments[0]);
 			}
 			else
 			{

@@ -1,11 +1,19 @@
 -main Build
 
+-cp src
+-cp scripts
+-cp test
+
 -lib hxp
 -lib exception
 -lib sys.io.abstractions
 
--cp src
+--macro nullSafety('Build')
 
---macro nullSafety('Main')
+--each
 
 -neko run.n
+
+--next
+
+-cpp bin/cpp

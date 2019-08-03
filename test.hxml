@@ -11,3 +11,5 @@
 -cp test
 
 -neko tests.n
+
+--macro nullSafety('Build')
