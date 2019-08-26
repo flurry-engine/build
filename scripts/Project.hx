@@ -55,6 +55,11 @@ class Project extends Script
      */
     var files : Map<String, String>;
 
+    /**
+     * List of all parcel definitions which will be generated during building.
+     */
+    var parcels : Array<String>;
+
     public final function new()
     {
         super();
@@ -107,7 +112,6 @@ class Project extends Script
                 compileSnow(_pathBuild, _pathRelease);
             case _unsupported:
                 Log.error('$_unsupported backend is not yet implemented');
-                Sys.exit(1);
         }
     }
 
@@ -208,6 +212,17 @@ class Project extends Script
         for (src => dst in files)
         {
             System.recursiveCopy(src, Path.combine(_pathRelease, dst));
+        }
+
+        // Build all required parcels.
+        var parcelDirectory = Path.join([ _pathRelease, 'assets', 'parcels' ]);
+        if (!FileSystem.exists(parcelDirectory))
+        {
+            System.makeDirectory(parcelDirectory);
+        }
+        for (parcel in parcels)
+        {
+            System.runCommand('', 'haxelib', [ 'run', 'parcel', 'pack', '--input=$parcel', '--output=$parcelDirectory' ]);
         }
 
         // Rename the output executable and copy it over to the .build directory.
