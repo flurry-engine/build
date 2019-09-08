@@ -155,14 +155,13 @@ class Project extends Script
         build.defines.set(System.hostPlatform  , null);
         build.defines.set('target-cpp'         , null);
         build.defines.set('desktop'            , null);
-        build.defines.set('hxcpp_static_std'   , null);
-        build.defines.set('snow_use_glew'      , null);
         build.defines.set('snow_native'        , null);
         build.defines.set('HXCPP_M64'          , null);
         build.defines.set('flurry-entry-point' , app.main);
 
         // Add snow required libraries and user specified libraries.
         build.dependencies.set('hxcpp'              , null);
+        build.dependencies.set('flurry-snow-host'   , null);
         build.dependencies.set('haxe-concurrent'    , null);
         build.dependencies.set('linc_opengl'        , null);
         build.dependencies.set('linc_directx'       , null);
@@ -173,7 +172,7 @@ class Project extends Script
         build.dependencies.set('format'             , null);
         build.dependencies.set('safety'             , null);
         build.dependencies.set('signals'            , null);
-        build.dependencies.set('snow'               , null);
+        build.dependencies.set('json2object'        , null);
 
         // Add snow required macros and user specified macros.
 
