@@ -160,14 +160,10 @@ class Project extends Script
         build.defines.set('flurry-entry-point' , app.main);
 
         // Add snow required libraries and user specified libraries.
-        build.dependencies.set('hxcpp'              , null);
         build.dependencies.set('flurry-snow-host'   , null);
         build.dependencies.set('haxe-concurrent'    , null);
-        build.dependencies.set('linc_opengl'        , null);
         build.dependencies.set('linc_directx'       , null);
-        build.dependencies.set('linc_sdl'           , null);
-        build.dependencies.set('linc_stb'           , null);
-        build.dependencies.set('linc_timestamp'     , null);
+        build.dependencies.set('linc_imgui'         , null);
         build.dependencies.set('sys.io.abstractions', null);
         build.dependencies.set('format'             , null);
         build.dependencies.set('safety'             , null);
