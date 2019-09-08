@@ -217,7 +217,7 @@ class Project extends Script
         }
         for (parcel in parcels)
         {
-            System.runCommand('', 'haxelib', [ 'run', 'parcel', 'pack', '--input=$parcel', '--output=$parcelDirectory' ]);
+            System.runCommand('', 'haxelib', [ 'run', 'parcel', 'pack', '--input', parcel, '--output', parcelDirectory ]);
         }
 
         // Rename the output executable and copy it over to the .build directory.
