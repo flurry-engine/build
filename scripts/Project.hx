@@ -69,6 +69,7 @@ class Project extends Script
         app     = new ProjectApp();
         build   = new ProjectBuild();
         files   = [];
+        parcels = [];
 
         setup();
 
@@ -223,17 +224,19 @@ class Project extends Script
         // Rename the output executable and copy it over to the .build directory.
         // Platform specific since file extensions change.
         // If the script is called with the 'run' command i.e. `hxp .. build.hxp run` then the binary should be launched after building.
-        switch (System.hostPlatform)
+        switch System.hostPlatform
         {
             case WINDOWS:
-                FileSystem.rename(Path.join([ _pathBuild, 'cpp', build.profile == Debug ? 'App-debug.exe' : 'App.exe' ]), Path.join([ _pathBuild, 'cpp', '${app.name}.exe' ]));
-                System.copyFile(Path.join([ _pathBuild, 'cpp', '${app.name}.exe' ]), Path.combine(_pathRelease, '${app.name}.exe'));
-            case MAC, LINUX:
-                FileSystem.rename(Path.join([ _pathBuild, 'cpp', build.profile == Debug ? 'App-debug' : 'App' ]), Path.join([ _pathBuild, 'cpp', app.name ]));
-                System.copyFile(Path.join([ _pathBuild, 'cpp', app.name ]), Path.combine(_pathRelease, app.name));
+                var src = Path.join([ _pathBuild, 'cpp', build.profile == Debug ? 'App-debug.exe' : 'App.exe' ]);
+                var dst = Path.combine(_pathRelease, '${app.name}.exe');
 
-                System.runCommand(workingDirectory, 'chmod a+x ${Path.join([ _pathBuild, 'cpp', app.name ])}', []);
-                System.runCommand(workingDirectory, 'chmod a+x ${Path.join([ _pathRelease, app.name ])}', []);
+                System.copyFile(src, dst);
+            case MAC, LINUX:
+                var src = Path.join([ _pathBuild, 'cpp', build.profile == Debug ? 'App-debug' : 'App' ]);
+                var dst = Path.combine(_pathRelease, app.name);
+
+                System.copyFile(src, dst);
+                System.runCommand(workingDirectory, 'chmod', [ 'a+x', dst ]);
         }
     }
 
