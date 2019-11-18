@@ -1,0 +1,13 @@
+-main Build
+
+-cp src
+-cp scripts
+-cp test
+
+-lib hxp
+-lib exception
+-lib sys.io.abstractions
+
+--macro nullSafety('Build')
+
+-neko run.n

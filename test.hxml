@@ -1,0 +1,15 @@
+-main Tests
+
+-lib hxp
+-lib exception
+-lib sys.io.abstractions
+-lib buddy
+-lib mockatoo
+-lib safety
+
+-cp src
+-cp test
+
+-neko tests.n
+
+--macro nullSafety('Build')
