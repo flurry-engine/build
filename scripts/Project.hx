@@ -11,7 +11,6 @@ import hxp.Log;
 private enum BuildProfile
 {
     Debug;
-    Default;
     Release;
 }
 
@@ -116,11 +115,6 @@ class Project extends Script
         }
     }
 
-    final function compileHaxe()
-    {
-        //
-    }
-
     final function compileSnow(_pathBuild : String, _pathRelease : String)
     {
         var user = new HXML();
@@ -140,8 +134,6 @@ class Project extends Script
                 user.noOpt = true;
                 user.dce   = NO;
                 build.defines.set('annotate_source', null);
-            case Default:
-                user.dce = STD;
             case Release:
                 user.dce = FULL;
                 user.noTraces = true;
@@ -198,7 +190,7 @@ class Project extends Script
         hxmlSnow.close();
 
         // Build the project
-        var result = System.runCommand(workingDirectory, 'haxe', [ Path.combine(_pathBuild, 'build.hxml')]);
+        var result = System.runCommand(workingDirectory, 'npx', [ 'haxe', Path.combine(_pathBuild, 'build.hxml')]);
         if (result != 0)
         {
             Sys.exit(result);
@@ -218,7 +210,7 @@ class Project extends Script
         }
         for (parcel in parcels)
         {
-            System.runCommand('', 'haxelib', [ 'run', 'parcel', 'pack', '--input', parcel, '--output', parcelDirectory ]);
+            System.runCommand('', 'npx', [ 'lix', 'run', 'parcel', 'pack', '--input', parcel, '--output', parcelDirectory ]);
         }
 
         // Rename the output executable and copy it over to the .build directory.
@@ -393,7 +385,7 @@ private class ProjectBuild
 
     public function new()
     {
-        profile      = Default;
+        profile      = Debug;
         noInline     = false;
         dependencies = [];
         macros       = [];

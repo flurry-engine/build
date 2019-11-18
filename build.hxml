@@ -10,10 +10,4 @@
 
 --macro nullSafety('Build')
 
---each
-
 -neko run.n
-
---next
-
--cpp bin/cpp
