@@ -1,12 +1,10 @@
--main Build
+-main Main
 
 -cp src
--cp scripts
--cp test
 
--lib hxp
 -lib exception
 -lib sys.io.abstractions
+-lib tink_cli
 
 --macro nullSafety('Build')
 

@@ -1,0 +1,25 @@
+{
+  "name": "build",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flurry-engine/build.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flurry-engine/build/issues"
+  },
+  "homepage": "https://github.com/flurry-engine/build#readme",
+  "dependencies": {
+    "lix": "^15.6.0-alpha.4"
+  }
+}
