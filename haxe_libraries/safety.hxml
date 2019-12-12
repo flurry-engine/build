@@ -1,4 +1,4 @@
-# @install: lix --silent download "gh://github.com/RealyUniqueName/Safety#6ca43276c9942293e72258379bf5898f859de07c" into safety/1.1.1/github/6ca43276c9942293e72258379bf5898f859de07c
+# @install: lix --silent download "haxelib:/safety#1.1.1" into safety/1.1.1/haxelib
 -lib exception
--cp ${HAXE_LIBCACHE}/safety/1.1.1/github/6ca43276c9942293e72258379bf5898f859de07c/src
+-cp ${HAXE_LIBCACHE}/safety/1.1.1/haxelib/src
 -D safety=1.1.1
