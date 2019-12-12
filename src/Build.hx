@@ -19,7 +19,7 @@ class Build
 
     final releasePath : String;
 
-    public function new(_buildFile : String, _clean : Bool, _debug : Bool)
+    public function new(_buildFile : String, _clean : Bool, _debug : Bool, _parcelTool : String)
     {
         trace('building');
 
@@ -44,10 +44,40 @@ class Build
         hxmlUser.close();
         hxmlSnow.close();
 
+        // Call haxe to build the project.
         final result = Sys.command('npx', [ 'haxe', Path.join([ buildPath, 'build.hxml' ]) ]);
         if (result != 0)
         {
             Sys.exit(result);
+        }
+
+        // Call the parcel tool to create any parcels
+        final parcelDirectory = Path.join([ releasePath, 'assets', 'parcels' ]);
+        if (!FileSystem.exists(parcelDirectory))
+        {
+            FileSystem.createDirectory(parcelDirectory);
+        }
+
+        for (parcel in project!.parcels.or([]))
+        {
+            Sys.command('npx', [ 'lix', 'run', 'parcel', 'pack', '--input', parcel, '--output', parcelDirectory ]);
+        }
+
+        // Rename the output executable and copy it over to the .build directory.
+        // Platform specific since file extensions change.
+        switch hostPlatform()
+        {
+            case 'windows':
+                var src = Path.join([ buildPath, 'cpp', project!.build!.profile.or(Debug) == Debug ? 'App-debug.exe' : 'App.exe' ]);
+                var dst = Path.join([ releasePath, '${project.app.name}.exe' ]);
+
+                File.copy(src, dst);
+            case 'osx', 'linux':
+                var src = Path.join([ buildPath, 'cpp', project!.build!.profile.or(Debug) == Debug ? 'App-debug' : 'App' ]);
+                var dst = Path.join([ releasePath, project.app.name ]);
+
+                File.copy(src, dst);
+                Sys.command('chmod', [ 'a+x', dst ]);
         }
 
         trace('done');

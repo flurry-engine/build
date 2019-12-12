@@ -86,7 +86,7 @@ class Main
     @:command
     public function build()
     {
-        new Build(buildFile, clean, debug);
+        new Build(buildFile, clean, debug, parcelTool);
     }
 
     /**
@@ -97,7 +97,7 @@ class Main
     {
         if (!noBuild)
         {
-            new Build(buildFile, clean, debug);
+            new Build(buildFile, clean, debug, parcelTool);
         }
 
         new Run(buildFile);
@@ -111,7 +111,7 @@ class Main
     {
         if (!noBuild)
         {
-            new Build(buildFile, clean, debug);
+            new Build(buildFile, clean, debug, parcelTool);
         }
 
         new Distribute();
