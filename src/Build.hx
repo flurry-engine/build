@@ -21,14 +21,21 @@ class Build
 
     public function new(_buildFile : String, _clean : Bool, _debug : Bool, _parcelTool : String)
     {
-        trace('building');
-
+        // Parse the input file, create the hxml objects, and create our output paths.
         project     = tink.Json.parse(File.getContent(_buildFile));
         user        = new Hxml();
         snow        = new Hxml();
         buildPath   = Path.join([ project!.app!.output.or('bin'), '${hostPlatform()}-${hostArchitecture()}.build' ]);
         releasePath = Path.join([ project!.app!.output.or('bin'), '${hostPlatform()}-${hostArchitecture()}' ]);
 
+        // Clean the output directories.
+        if (_clean)
+        {
+            clean(buildPath);
+            clean(releasePath);
+        }
+
+        // create the game and snow hxml file.
         writeUserHxml(_debug);
         writeSnowHxml();
 
@@ -79,8 +86,6 @@ class Build
                 File.copy(src, dst);
                 Sys.command('chmod', [ 'a+x', dst ]);
         }
-
-        trace('done');
     }
 
     function writeUserHxml(_debug : Bool)
@@ -172,5 +177,23 @@ class Build
         case Desktop: 'uk.aidanlee.flurry.snow.runtime.FlurrySnowDesktopRuntime';
         case Cli    : 'uk.aidanlee.flurry.snow.runtime.FlurrySnowCLIRuntime';
         case Custom(_package): _package;
+    }
+
+    function clean(_path : String)
+    {
+        for (file in FileSystem.readDirectory(_path))
+        {
+            final item = Path.join([ _path, file ]);
+            if (FileSystem.isDirectory(item))
+            {
+                clean(item);
+
+                FileSystem.deleteDirectory(item);
+            }
+            else
+            {
+                FileSystem.deleteFile(item);
+            }
+        }
     }
 }
