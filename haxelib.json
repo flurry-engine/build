@@ -1,0 +1,8 @@
+{
+    "classPath": "src",
+    "license": "MIT",
+    "name": "Build",
+    "contributors": [ "Aidan" ],
+    "version": "1.0.0",
+    "releasenote": "Initial version"
+}
