@@ -31,7 +31,7 @@ abstract Hxml(StringBuf)
 
     public function addClassPath(_path : String) append('-p $_path');
 
-    public function addLibrary(_lib : String, _version : Null<String> = null) append('-L $_lib${ _version != null ? ':$_version' : '' }');
+    public function addLibrary(_lib : String, _version : Null<String> = null) append('-lib $_lib${ _version != null ? ':$_version' : '' }');
 
     public function addDefine(_define : String, _value : Null<String> = null) append('-D $_define${ _value != null ? '=$_value' : '' }');
 
