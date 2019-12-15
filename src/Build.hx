@@ -67,7 +67,7 @@ class Build
 
         for (parcel in project!.parcels.or([]))
         {
-            Sys.command('npx', [ 'lix', 'run', 'parcel', 'pack', '--input', parcel, '--output', parcelDirectory ]);
+            Sys.command([ _parcelTool, 'pack', '--input', '"$parcel"', '--output', '"$parcelDirectory"' ].join(' '));
         }
 
         // Rename the output executable and copy it over to the .build directory.
