@@ -28,7 +28,6 @@ class Utils
         case 'Mac', 'Linux' : {
             var process = new Process("uname", ["-m"]);
             var output  = process.stdout.readAll().toString();
-            var error   = process.stderr.readAll().toString();
             process.exitCode();
             process.close();
 

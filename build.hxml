@@ -2,11 +2,11 @@
 
 -p src
 
--L exception
--L sys.io.abstractions
--L tink_cli
--L tink_json
--L safety
+-lib exception
+-lib sys.io.abstractions
+-lib tink_cli
+-lib tink_json
+-lib safety
 
 --dce full
 

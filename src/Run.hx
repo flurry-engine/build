@@ -1,6 +1,5 @@
 import haxe.io.Path;
 import Types.Project;
-import sys.FileSystem;
 import Utils.hostPlatform;
 import Utils.hostArchitecture;
 

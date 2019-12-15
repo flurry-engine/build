@@ -81,6 +81,15 @@ class Main
     }
 
     /**
+     * //
+     */
+    @:command
+    public function create()
+    {
+        new Create(buildFile);
+    }
+
+    /**
      * Compiles the project described by the json build file.
      */
     @:command
