@@ -1,13 +1,16 @@
--main Build
+-m Main
 
--cp src
--cp scripts
--cp test
+-p src
 
--lib hxp
 -lib exception
 -lib sys.io.abstractions
+-lib tink_cli
+-lib tink_json
+-lib safety
 
---macro nullSafety('Build')
+--dce full
 
--neko run.n
+--macro nullSafety('Main')
+--macro Safety.safeNavigation('')
+
+--neko run.n
