@@ -4,6 +4,20 @@ class Main
 {
     static function main()
     {
+        // When the tool is ran from haxelib the CWD is the root directory of the haxelib.
+		// Haxelib also appends the CWD where it was called from as a last argument and sets the 'HAXELIB_RUN' env.
+		// So if we are running in haxelib mode set the CWD to the last cli argument.
+		if (Sys.getEnv('HAXELIB_RUN') == '1')
+		{
+            final args = Sys.args();
+			final cwd  = args.pop();
+
+			if (cwd != null)
+			{
+				Sys.setCwd(cwd);
+			}
+		}
+
         Cli.process(Sys.args(), new Main()).handle(Cli.exit);
     }
 
