@@ -98,8 +98,6 @@ class Build
             case Debug:
                 user.dce = no;
                 user.debug();
-                user.noOptimisations();
-                user.addDefine('annotate_source');
             case Release:
                 user.dce = full;
                 user.noTraces();
