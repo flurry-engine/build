@@ -116,6 +116,7 @@ class Build
         user.addDefine('snow_native');
         user.addDefine('HXCPP_M64');
         user.addDefine('flurry-entry-point' , project!.app!.main.or(''));
+        user.addMacro('Safety.safeNavigation("uk.aidanlee.flurry")');
 
         // Add snow required libraries and user specified libraries.
         for (d in [
