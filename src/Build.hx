@@ -128,7 +128,8 @@ class Build
             'format',
             'safety',
             'signals',
-            'json2object' ])
+            'json2object',
+            'RxHaxe' ])
         {
             user.addLibrary(d);
             user.addDefine(d);
