@@ -125,7 +125,6 @@ class Build
             'sys.io.abstractions',
             'format',
             'safety',
-            'signals',
             'json2object',
             'RxHaxe' ])
         {

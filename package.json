@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/flurry-engine/build#readme",
   "dependencies": {
-    "lix": "^15.6.0-alpha.4"
+    "lix": "^15.8.15"
   }
 }
