@@ -125,7 +125,7 @@ class Build
             'sys.io.abstractions',
             'format',
             'safety',
-            'json2object',
+            'hxbit',
             'RxHaxe' ])
         {
             user.addLibrary(d);
