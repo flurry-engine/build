@@ -2,11 +2,11 @@
 
 -p src
 
--lib exception
 -lib sys.io.abstractions
 -lib tink_cli
 -lib tink_json
 -lib safety
+-lib akifox-asynchttp
 
 --dce full
 

@@ -1,11 +1,16 @@
 import Types.Project;
+import haxe.zip.Reader;
+import haxe.io.BytesInput;
 import haxe.io.Path;
 import sys.io.File;
 import sys.FileSystem;
+import com.akifox.asynchttp.HttpRequest;
 import Utils.hostPlatform;
 import Utils.hostArchitecture;
+import Utils.atlasToolExecutable;
 
 using Safety;
+using StringTools;
 
 class Build
 {
@@ -14,6 +19,8 @@ class Build
     final user : Hxml;
 
     final snow : Hxml;
+
+    final toolsPath : String;
 
     final buildPath : String;
 
@@ -25,6 +32,7 @@ class Build
         project     = tink.Json.parse(File.getContent(_buildFile));
         user        = new Hxml();
         snow        = new Hxml();
+        toolsPath   = Path.join([ project!.app!.output.or('bin'), 'tools', hostPlatform() ]);
         buildPath   = Path.join([ project!.app!.output.or('bin'), '${hostPlatform()}-${hostArchitecture()}.build' ]);
         releasePath = Path.join([ project!.app!.output.or('bin'), '${hostPlatform()}-${hostArchitecture()}' ]);
 
@@ -35,10 +43,13 @@ class Build
             clean(releasePath);
         }
 
+        downloadAtlasTool();
+
         // create the game and snow hxml file.
         writeUserHxml(_debug);
         writeSnowHxml();
 
+        FileSystem.createDirectory(toolsPath);
         FileSystem.createDirectory(buildPath);
         FileSystem.createDirectory(releasePath);
 
@@ -193,6 +204,41 @@ class Build
             {
                 FileSystem.deleteFile(item);
             }
+        }
+    }
+
+    function downloadAtlasTool()
+    {
+        final atlasTool = Path.join([ toolsPath, atlasToolExecutable() ]);
+
+        if (!FileSystem.exists(atlasTool))
+        {
+            new HttpRequest({
+                url : 'https://api.github.com/repos/flurry-engine/msdf-atlas-gen/releases/latest',
+                callback : response -> {
+                    for (asset in (haxe.Json.parse(response.content).assets : Array<Dynamic>))
+                    {
+                        if ((asset.name : String).contains(hostPlatform()))
+                        {
+                            new HttpRequest({
+                                url           : asset.browser_download_url,
+                                callback      : response -> {
+                                    final input = new BytesInput(response.contentRaw);
+
+                                    // There should only be one entry in the zip archive
+                                    File.saveBytes(atlasTool, Reader.readZip(input).first().sure().data);
+
+                                    input.close();
+                                },
+                                callbackError : response -> trace('Error downloading atlas generator binary ${ response.error }')
+                            }).send();
+
+                            break;
+                        }
+                    }
+                },
+                callbackError : response -> trace('Unable to get latest atlas tool release from github ${ response.error }')
+            }).send();
         }
     }
 }
