@@ -81,7 +81,12 @@ class Build
 
         for (parcel in project!.parcels.or([]))
         {
-            Sys.command([ _parcelTool, 'pack', '--input', '"$parcel"', '--output', '"$parcelDirectory"' ].join(' '));
+            Sys.command([
+                _parcelTool, 'pack',
+                '--input', '"$parcel"',
+                '--output', '"$parcelDirectory"',
+                '--msdf-atlas-gen', '"${ Path.join([ toolsPath, atlasToolExecutable() ]) }"',
+                '--gdx-jar', '"${ Path.join([ toolsPath, 'runnable-texturepacker.jar' ]) }"' ].join(' '));
         }
 
         // Rename the output executable and copy it over to the .build directory.
