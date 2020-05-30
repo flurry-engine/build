@@ -43,8 +43,6 @@ class Build
             clean(releasePath);
         }
 
-        downloadAtlasTool();
-
         // create the game and snow hxml file.
         writeUserHxml(_debug);
         writeSnowHxml();
@@ -61,6 +59,11 @@ class Build
 
         hxmlUser.close();
         hxmlSnow.close();
+
+        // Ensure we have all our build tools before starting compilation
+
+        downloadMdsfAtlasGen();
+        downloadLbgdxTexturePackerJar();
 
         // Call haxe to build the project.
         final result = Sys.command('npx', [ 'haxe', Path.join([ buildPath, 'build.hxml' ]) ]);
@@ -207,14 +210,18 @@ class Build
         }
     }
 
-    function downloadAtlasTool()
+    /**
+     * Download the msdf-atlas-gen binary for this OS.
+     */
+    function downloadMdsfAtlasGen()
     {
-        final atlasTool = Path.join([ toolsPath, atlasToolExecutable() ]);
+        final msdfTool = Path.join([ toolsPath, atlasToolExecutable() ]);
 
-        if (!FileSystem.exists(atlasTool))
+        if (!FileSystem.exists(msdfTool))
         {
             new HttpRequest({
-                url : 'https://api.github.com/repos/flurry-engine/msdf-atlas-gen/releases/latest',
+                url      : 'https://api.github.com/repos/flurry-engine/msdf-atlas-gen/releases/latest',
+                async    : false,
                 callback : response -> {
                     for (asset in (haxe.Json.parse(response.content).assets : Array<Dynamic>))
                     {
@@ -226,18 +233,36 @@ class Build
                                     final input = new BytesInput(response.contentRaw);
 
                                     // There should only be one entry in the zip archive
-                                    File.saveBytes(atlasTool, Reader.readZip(input).first().sure().data);
+                                    File.saveBytes(msdfTool, Reader.readZip(input).first().sure().data);
 
                                     input.close();
                                 },
-                                callbackError : response -> trace('Error downloading atlas generator binary ${ response.error }')
+                                callbackError : response -> trace('Error downloading msdf-atlas-gen binary ${ response.error }')
                             }).send();
 
                             break;
                         }
                     }
                 },
-                callbackError : response -> trace('Unable to get latest atlas tool release from github ${ response.error }')
+                callbackError : response -> trace('Unable to get latest msdf-atlas-gen release from github ${ response.error }')
+            }).send();
+        }
+    }
+
+    /**
+     * Download the standalone libgdx texture packer jar into the tools directory.
+     */
+    function downloadLbgdxTexturePackerJar()
+    {
+        final atlasTool = Path.join([ toolsPath, 'runnable-texturepacker.jar' ]);
+
+        if (!FileSystem.exists(atlasTool))
+        {
+            new HttpRequest({
+                url           : 'https://libgdx.badlogicgames.com/nightlies/runnables/runnable-texturepacker.jar',
+                async         : false,
+                callback      : response -> File.saveBytes(atlasTool, response.contentRaw),
+                callbackError : response -> trace('Unable to get latest libgdx texture packer jar ${ response.error }')
             }).send();
         }
     }
