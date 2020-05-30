@@ -2,10 +2,16 @@ import sys.io.Process;
 
 class Utils
 {
+    public static function atlasToolExecutable() return switch Sys.systemName()
+    {
+        case 'Windows' : 'msdf-atlas-gen.exe';
+        case _: 'msdf-atlas-gen';
+    }
+
     public static function hostPlatform() return switch Sys.systemName()
     {
         case 'Windows' : 'windows';
-        case 'Mac'     : 'osx';
+        case 'Mac'     : 'mac';
         case 'Linux'   : 'linux';
         case _         : 'other';
     }
