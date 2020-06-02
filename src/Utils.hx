@@ -1,13 +1,10 @@
+import sys.FileSystem;
+import sys.io.File;
 import sys.io.Process;
+import haxe.io.Path;
 
 class Utils
 {
-    public static function atlasToolExecutable() return switch Sys.systemName()
-    {
-        case 'Windows' : 'msdf-atlas-gen.exe';
-        case _: 'msdf-atlas-gen';
-    }
-
     public static function hostPlatform() return switch Sys.systemName()
     {
         case 'Windows' : 'windows';
@@ -55,5 +52,11 @@ class Utils
             }
         }
         case _ : 'other';
+    }
+
+    public static function msdfAtlasExecutable() return switch Sys.systemName()
+    {
+        case 'Windows' : 'msdf-atlas-gen.exe';
+        case _ : 'msdf-atlas-gen';
     }
 }

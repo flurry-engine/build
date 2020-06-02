@@ -10,7 +10,6 @@
 
 --dce full
 
---macro nullSafety('Main')
 --macro Safety.safeNavigation('')
 
 --neko run.n

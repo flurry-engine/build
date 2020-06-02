@@ -88,8 +88,7 @@ class Main
         hlslCompiled = 'fxc';
     }
 
-    @:defaultCommand
-    public function help()
+    @:defaultCommand public function help()
     {
         Sys.println(Cli.getDoc(this));
     }
@@ -97,29 +96,28 @@ class Main
     /**
      * //
      */
-    @:command
-    public function create()
+    @:command public function create()
     {
         new Create(buildFile);
     }
 
     /**
-     * Compiles the project described by the json build file.
+     * Compile the project and required assets.
      */
-    @:command
-    public function build()
+    @:command public function build()
     {
+        new Restore(buildFile);
         new Build(buildFile, clean, debug, parcelTool);
     }
 
     /**
-     * Runs the project described by the json build file.
+     * Run the project.
      */
-    @:command
-    public function run()
+    @:command public function run()
     {
         if (!noBuild)
         {
+            new Restore(buildFile);
             new Build(buildFile, clean, debug, parcelTool);
         }
 
@@ -127,10 +125,9 @@ class Main
     }
 
     /**
-     * Packages the project described by the json build file for distribution.
+     * Package a for distribution.
      */
-    @:command
-    public function distribute()
+    @:command public function distribute()
     {
         if (!noBuild)
         {
@@ -138,5 +135,13 @@ class Main
         }
 
         new Distribute();
+    }
+
+    /**
+     * Download all the dependencies required to a project.
+     */
+    @:command public function restore()
+    {
+        new Restore(buildFile);
     }
 }
