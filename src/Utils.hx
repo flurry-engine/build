@@ -1,7 +1,4 @@
-import sys.FileSystem;
-import sys.io.File;
 import sys.io.Process;
-import haxe.io.Path;
 
 class Utils
 {
@@ -10,6 +7,14 @@ class Utils
         case 'Windows' : 'windows';
         case 'Mac'     : 'mac';
         case 'Linux'   : 'linux';
+        case _         : 'other';
+    }
+
+    public static function msdfPlatform() return switch Sys.systemName()
+    {
+        case 'Windows' : 'windows';
+        case 'Mac'     : 'mac';
+        case 'Linux'   : 'ubuntu';
         case _         : 'other';
     }
 

@@ -5,6 +5,7 @@ import haxe.io.Path;
 import haxe.io.BytesInput;
 import haxe.zip.Reader;
 import com.akifox.asynchttp.HttpRequest;
+import Utils.msdfPlatform;
 import Utils.hostPlatform;
 import Utils.msdfAtlasExecutable;
 
@@ -48,7 +49,7 @@ class Restore
                 callback : response -> {
                     for (asset in (haxe.Json.parse(response.content).assets : Array<Dynamic>))
                     {
-                        if ((asset.name : String).contains(hostPlatform()))
+                        if ((asset.name : String).contains(msdfPlatform()))
                         {
                             new HttpRequest({
                                 url           : asset.browser_download_url,
