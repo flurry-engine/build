@@ -55,12 +55,19 @@ class Restore
                                 url           : asset.browser_download_url,
                                 async         : false,
                                 callback      : response -> {
-                                    final input = new BytesInput(response.contentRaw);
+                                    if (response.isBinary)
+                                    {
+                                        final input = new BytesInput(response.contentRaw);
 
-                                    // There should only be one entry in the zip archive
-                                    File.saveBytes(msdfTool, Reader.readZip(input).first().sure().data);
-
-                                    input.close();
+                                        // There should only be one entry in the zip archive
+                                        File.saveBytes(msdfTool, Reader.readZip(input).first().sure().data);
+    
+                                        input.close();   
+                                    }
+                                    else
+                                    {
+                                        throw 'data is not binary';
+                                    }
                                 },
                                 callbackError : response -> trace('Error downloading msdf-atlas-gen binary ${ response.error }')
                             }).send();
