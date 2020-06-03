@@ -52,6 +52,7 @@ class Restore
                         {
                             new HttpRequest({
                                 url           : asset.browser_download_url,
+                                async         : false,
                                 callback      : response -> {
                                     final input = new BytesInput(response.contentRaw);
 
