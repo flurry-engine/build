@@ -30,7 +30,6 @@ class Restore
         tempPath  = Path.join([ project!.app!.output.or('bin'), 'temp' ]);
 
         FileSystem.createDirectory(toolsPath);
-        FileSystem.createDirectory(tempPath);
 
         Sys.command('npx', [ 'lix', 'download' ]);
 
@@ -43,50 +42,26 @@ class Restore
      */
     function downloadMdsfAtlasGen()
     {
+        FileSystem.createDirectory(tempPath);
+
         final executable = msdfAtlasExecutable();
         final tempZip    = Path.join([ tempPath, 'temp.zip' ]);
         final msdfTool   = Path.join([ toolsPath, executable ]);
-
-        if (hostPlatform() == 'linux')
+        final url        = switch Sys.systemName()
         {
-            // For some reason haxe will not extract the linux atlas zip, so we use command line tools instead
-            Sys.command('curl', [ '-L', '-o', tempZip, 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/ubuntu-latest.zip' ]);
-            Sys.command('tar', [ '-xvf', tempZip, '-C', toolsPath ]);
-            Sys.command('rm', [ tempZip ]);
+            case 'Windows' : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/windows-latest.zip';
+            case 'Mac'     : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/macOS-latest.zip';
+            case 'Linux'   : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/ubuntu-latest.zip';
+            case unknown   : throw '$unknown not supported';
         }
-        else
+
+        if (!FileSystem.exists(msdfTool))
         {
-            if (!FileSystem.exists(msdfTool))
-            {
-                new HttpRequest({
-                    url      : 'https://api.github.com/repos/flurry-engine/msdf-atlas-gen/releases/latest',
-                    async    : false,
-                    callback : response -> {
-                        for (asset in (haxe.Json.parse(response.content).assets : Array<Dynamic>))
-                        {
-                            if ((asset.name : String).contains(msdfPlatform()))
-                            {
-                                new HttpRequest({
-                                    url           : asset.browser_download_url,
-                                    async         : false,
-                                    callback      : response -> {
-                                            final input = new BytesInput(response.contentRaw);
+            Sys.command('curl', [ '-L', '-o', tempZip, url ]);
+            Sys.command('tar', [ '-xvf', tempZip, '-C', toolsPath ]);
     
-                                            // There should only be one entry in the zip archive
-                                            File.saveBytes(msdfTool, Reader.readZip(input).first().sure().data);
-        
-                                            input.close();   
-                                    },
-                                    callbackError : response -> trace('Error downloading msdf-atlas-gen binary ${ response.error }')
-                                }).send();
-    
-                                break;
-                            }
-                        }
-                    },
-                    callbackError : response -> trace('Unable to get latest msdf-atlas-gen release from github ${ response.error }')
-                }).send();
-            }
+            FileSystem.deleteFile(tempZip);
+            FileSystem.deleteDirectory(tempPath);
         }
     }
 
