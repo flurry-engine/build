@@ -7,15 +7,15 @@ class Utils
         case 'Windows' : 'windows';
         case 'Mac'     : 'mac';
         case 'Linux'   : 'linux';
-        case _         : 'other';
+        case unknown   : throw '$unknown not supported';
     }
 
     public static function msdfPlatform() return switch Sys.systemName()
     {
-        case 'Windows' : 'windows';
-        case 'Mac'     : 'mac';
-        case 'Linux'   : 'ubuntu';
-        case _         : 'other';
+        case 'Windows' : 'windows-latest';
+        case 'Mac'     : 'macOS-latest';
+        case 'Linux'   : 'ubuntu-latest';
+        case unknown   : throw '$unknown not supported';
     }
 
     public static function hostArchitecture() return switch Sys.systemName()

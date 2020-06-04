@@ -18,6 +18,8 @@ class Restore
 
     final toolsPath : String;
 
+    final tempPath : String;
+
     final project : Project;
 
     public function new(_buildFile : String)
@@ -25,68 +27,74 @@ class Restore
         buildFile = _buildFile;
         project   = tink.Json.parse(File.getContent(buildFile));
         toolsPath = Path.join([ project!.app!.output.or('bin'), 'tools', hostPlatform() ]);
+        tempPath  = Path.join([ project!.app!.output.or('bin'), 'temp' ]);
 
         FileSystem.createDirectory(toolsPath);
 
         Sys.command('npx', [ 'lix', 'download' ]);
 
-        downloadMdsfAtlasGen(toolsPath);
-        downloadLbgdxTexturePackerJar(toolsPath);
+        downloadMdsfAtlasGen();
+        downloadLbgdxTexturePackerJar();
     }
 
     /**
      * Download the msdf-atlas-gen binary for this OS.
      */
-    function downloadMdsfAtlasGen(_toolsPath : String)
+    function downloadMdsfAtlasGen()
     {
-        final msdfTool = Path.join([ _toolsPath, msdfAtlasExecutable() ]);
+        final executable = msdfAtlasExecutable();
+        final tempZip    = Path.join([ tempPath, 'temp.zip' ]);
+        final msdfTool   = Path.join([ toolsPath, executable ]);
 
-        if (!FileSystem.exists(msdfTool))
+        if (hostPlatform() == 'linux')
         {
-            new HttpRequest({
-                url      : 'https://api.github.com/repos/flurry-engine/msdf-atlas-gen/releases/latest',
-                async    : false,
-                callback : response -> {
-                    for (asset in (haxe.Json.parse(response.content).assets : Array<Dynamic>))
-                    {
-                        if ((asset.name : String).contains(msdfPlatform()))
+            // For some reason haxe will not extract the linux atlas zip, so we use command line tools instead
+            Sys.command('curl', [ '-L', '-o', tempZip, 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/ubuntu-latest.zip' ]);
+            Sys.command('tar', [ '-xvf', tempZip, '-C', toolsPath ]);
+            Sys.command('rm', [ tempZip ]);
+        }
+        else
+        {
+            if (!FileSystem.exists(msdfTool))
+            {
+                new HttpRequest({
+                    url      : 'https://api.github.com/repos/flurry-engine/msdf-atlas-gen/releases/latest',
+                    async    : false,
+                    callback : response -> {
+                        for (asset in (haxe.Json.parse(response.content).assets : Array<Dynamic>))
                         {
-                            new HttpRequest({
-                                url           : asset.browser_download_url,
-                                async         : false,
-                                callback      : response -> {
-                                    if (response.isBinary)
-                                    {
-                                        final input = new BytesInput(response.contentRaw);
-
-                                        // There should only be one entry in the zip archive
-                                        File.saveBytes(msdfTool, Reader.readZip(input).first().sure().data);
+                            if ((asset.name : String).contains(msdfPlatform()))
+                            {
+                                new HttpRequest({
+                                    url           : asset.browser_download_url,
+                                    async         : false,
+                                    callback      : response -> {
+                                            final input = new BytesInput(response.contentRaw);
     
-                                        input.close();   
-                                    }
-                                    else
-                                    {
-                                        throw 'data is not binary';
-                                    }
-                                },
-                                callbackError : response -> trace('Error downloading msdf-atlas-gen binary ${ response.error }')
-                            }).send();
-
-                            break;
+                                            // There should only be one entry in the zip archive
+                                            File.saveBytes(msdfTool, Reader.readZip(input).first().sure().data);
+        
+                                            input.close();   
+                                    },
+                                    callbackError : response -> trace('Error downloading msdf-atlas-gen binary ${ response.error }')
+                                }).send();
+    
+                                break;
+                            }
                         }
-                    }
-                },
-                callbackError : response -> trace('Unable to get latest msdf-atlas-gen release from github ${ response.error }')
-            }).send();
+                    },
+                    callbackError : response -> trace('Unable to get latest msdf-atlas-gen release from github ${ response.error }')
+                }).send();
+            }
         }
     }
 
     /**
      * Download the standalone libgdx texture packer jar into the tools directory.
      */
-    function downloadLbgdxTexturePackerJar(_toolsPath : String)
+    function downloadLbgdxTexturePackerJar()
     {
-        final atlasTool = Path.join([ _toolsPath, 'runnable-texturepacker.jar' ]);
+        final atlasTool = Path.join([ toolsPath, 'runnable-texturepacker.jar' ]);
 
         if (!FileSystem.exists(atlasTool))
         {
