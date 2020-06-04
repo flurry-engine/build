@@ -30,6 +30,7 @@ class Restore
         tempPath  = Path.join([ project!.app!.output.or('bin'), 'temp' ]);
 
         FileSystem.createDirectory(toolsPath);
+        FileSystem.createDirectory(tempPath);
 
         Sys.command('npx', [ 'lix', 'download' ]);
 
