@@ -2,11 +2,11 @@
 
 -p src
 
--lib sys.io.abstractions
 -lib tink_cli
 -lib tink_json
--lib safety
 -lib akifox-asynchttp
+-lib safety
+-lib format
 
 --dce full
 

@@ -3,9 +3,8 @@ import sys.FileSystem;
 import sys.io.File;
 import haxe.io.Path;
 import haxe.io.BytesInput;
-import haxe.zip.Reader;
+import format.tgz.Reader;
 import com.akifox.asynchttp.HttpRequest;
-import Utils.msdfPlatform;
 import Utils.hostPlatform;
 import Utils.msdfAtlasExecutable;
 
@@ -42,26 +41,34 @@ class Restore
      */
     function downloadMdsfAtlasGen()
     {
-        FileSystem.createDirectory(tempPath);
-
         final executable = msdfAtlasExecutable();
-        final tempZip    = Path.join([ tempPath, 'temp.zip' ]);
         final msdfTool   = Path.join([ toolsPath, executable ]);
         final url        = switch Sys.systemName()
         {
-            case 'Windows' : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/windows-latest.zip';
-            case 'Mac'     : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/macOS-latest.zip';
-            case 'Linux'   : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/ubuntu-latest.zip';
+            case 'Windows' : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/windows-latest.tar.gz';
+            case 'Mac'     : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/macOS-latest.tar.gz';
+            case 'Linux'   : 'https://github.com/flurry-engine/msdf-atlas-gen/releases/download/CI/ubuntu-latest.tar.gz';
             case unknown   : throw '$unknown not supported';
         }
 
         if (!FileSystem.exists(msdfTool))
         {
-            Sys.command('curl', [ '-L', '-o', tempZip, url ]);
-            Sys.command('tar', [ '-xvf', tempZip, '-C', toolsPath ]);
-    
-            FileSystem.deleteFile(tempZip);
-            FileSystem.deleteDirectory(tempPath);
+            new HttpRequest({
+                async         : false,
+                url           : url,
+                callback      : success -> {
+                    final input = new BytesInput(success.contentRaw);
+                    final entry = new Reader(input).read().first();
+
+                    File.saveBytes(msdfTool, entry.data);
+
+                    input.close();
+                },
+                callbackError : error -> {
+                    Sys.println('Unable to download msdf-atlas-gen : ${ error.error }');
+                    Sys.exit(1);
+                }
+            }).send();
         }
     }
 
@@ -75,10 +82,13 @@ class Restore
         if (!FileSystem.exists(atlasTool))
         {
             new HttpRequest({
-                url           : 'https://libgdx.badlogicgames.com/nightlies/runnables/runnable-texturepacker.jar',
                 async         : false,
-                callback      : response -> File.saveBytes(atlasTool, response.contentRaw),
-                callbackError : response -> trace('Unable to get latest libgdx texture packer jar ${ response.error }')
+                url           : 'https://libgdx.badlogicgames.com/nightlies/runnables/runnable-texturepacker.jar',
+                callback      : success -> File.saveBytes(atlasTool, success.contentRaw),
+                callbackError : error -> {
+                    Sys.println('Unable to download libgdx texture packer : ${ error.error }');
+                    Sys.exit(1);
+                }
             }).send();
         }
     }
